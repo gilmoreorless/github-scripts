@@ -1,14 +1,33 @@
 #!/bin/bash
+
+### CONFIG ###
+
+GIT_BASEDIR=~/Sites/git/
+
+
+### SCRIPT ###
+
+PROGNAME=$(basename $0)
 if [ $# -lt 2 ]; then
-	echo "You need to enter a username and repository"
+	echo "Usage: $PROGNAME <username> <repository> [ssh]"
+	echo "Clone a repository from GitHub into a standard directory structure"
+	echo ""
+	echo "The clone URL passed to git is:"
+	echo ""
+	echo "    http://github.com/<username>/<repository>.git"
+	echo ""
+	echo "Optionally, if 'ssh' is passed as the third parameter the clone URL changes to:"
+	echo ""
+	echo "    git@github.com:<username>/<repository>.git"
+	echo ""
 	exit 1
 fi
-GITDIR=~/Sites/git/$1
+GITDIR=${GIT_BASEDIR}${1}
 [ ! -d $GITDIR ] && mkdir $GITDIR
 if [ "$3" != "ssh" ]; then
 	REPOS="http://github.com/"
 else
 	REPOS="git@github.com:"
 fi
-cd $GITDIR && git clone ${REPOS}$1/$2.git
+cd $GITDIR && git clone ${REPOS}${1}/${2}.git
 
