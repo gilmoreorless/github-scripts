@@ -14,7 +14,7 @@ if [ $# -lt 2 ]; then
 	echo ""
 	echo "The clone URL passed to git is:"
 	echo ""
-	echo "    http://github.com/<username>/<repository>.git"
+	echo "    https://github.com/<username>/<repository>.git"
 	echo ""
 	echo "Optionally, if 'ssh' is passed as the third parameter the clone URL changes to:"
 	echo ""
@@ -25,7 +25,7 @@ fi
 GITDIR=$GIT_BASEDIR/$1
 [ ! -d $GITDIR ] && mkdir $GITDIR
 if [ "$3" != "ssh" ]; then
-	REPOS="http://github.com/"
+	REPOS="https://github.com/"
 else
 	REPOS="git@github.com:"
 fi
