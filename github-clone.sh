@@ -2,7 +2,7 @@
 
 ### CONFIG ###
 
-GIT_BASEDIR=~/Sites/git/
+GIT_BASEDIR=~/Sites/git
 
 
 ### SCRIPT ###
@@ -22,7 +22,7 @@ if [ $# -lt 2 ]; then
 	echo ""
 	exit 1
 fi
-GITDIR=${GIT_BASEDIR}${1}
+GITDIR=$GIT_BASEDIR/$1
 [ ! -d $GITDIR ] && mkdir $GITDIR
 if [ "$3" != "ssh" ]; then
 	REPOS="http://github.com/"

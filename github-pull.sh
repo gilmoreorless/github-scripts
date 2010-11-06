@@ -1,32 +1,48 @@
 #!/bin/bash
-USERNAME=$1
-GITPULLCMD="git pull origin master"
-GITDIR=~/Sites/git
 
-function updateAllRepos {
-	DIR=$GITDIR/$1
+### CONFIG ###
+
+GIT_BASEDIR=~/Sites/git
+GIT_PULLCMD="git pull origin master"
+
+### SCRIPT ###
+
+PROGNAME=$(basename $0)
+if [ "$1" = "-h" -o "$1" = "--help" ]; then
+	echo "Usage: $PROGNAME [<username>]"
+	echo "Update all git repositories found in a standard directory structure"
+	echo ""
+	exit 1
+fi
+USERNAME=$1
+
+function update_all_repos {
+	DIR=$GIT_BASEDIR/$1
+	FOUND=0
 	echo -e "\n\n----- $DIR -----"
-	# Do git pull origin master here
 	for repodir in $(ls -1 $DIR); do
 		if [ -d $DIR/$repodir -a -d $DIR/$repodir/.git ]; then
 			echo -e "\n-------- $repodir -------\n"
-			cd $DIR/$repodir/ && $GITPULLCMD
+			cd $DIR/$repodir/ && $GIT_PULLCMD
+			FOUND=1
 		fi
 	done
+	if [ $FOUND = 0 ]; then
+		echo -e "\n    (No git repositories found)"
+	fi
 }
 
 if [ "$USERNAME" != "" ]; then
-	USERGITDIR=$GITDIR/$USERNAME
-	if [ ! -d $USERGITDIR ]; then
-		echo "Cannot find user directory: $USERGITDIR"
+	USER_GIT_BASEDIR=$GIT_BASEDIR/$USERNAME
+	if [ ! -d $USER_GIT_BASEDIR ]; then
+		echo "Error: Cannot find user directory: $USER_GIT_BASEDIR"
 		exit 1
 	fi
-	updateAllRepos $USERNAME
+	update_all_repos $USERNAME
 	exit 0
 fi
 
-for userdir in $(ls -1 $GITDIR); do
-	[ -d $GITDIR/$userdir ] && updateAllRepos $userdir
+for userdir in $(ls -1 $GIT_BASEDIR); do
+	[ -d $GIT_BASEDIR/$userdir ] && update_all_repos $userdir
 done
-exit 0
 
