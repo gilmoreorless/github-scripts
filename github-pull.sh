@@ -17,6 +17,7 @@ fi
 USERNAME=$1
 LIST_GOOD=""
 LIST_BAD=""
+START_TIME=$(date +%s)
 
 function update_all_repos {
 	DIR=$GIT_BASEDIR/$1
@@ -40,10 +41,13 @@ function update_all_repos {
 }
 
 function output_stats {
+	END_TIME=$(date +%s)
+	TOTAL_TIME=$(($END_TIME - $START_TIME))
 	echo -e "\n\n--- SUCCESSFUL ---\n"
 	[ -n "$LIST_GOOD" ] && echo -e $LIST_GOOD || echo -e "(No successful updates)\n"
 	echo -e "\n--- FAILED ---\n"
 	[ -n "$LIST_BAD" ] && echo -e $LIST_BAD || echo -e "(No failed updates)\n"
+	echo -e "\nTOTAL TIME: ${TOTAL_TIME}s\n"
 }
 
 if [ "$USERNAME" != "" ]; then
