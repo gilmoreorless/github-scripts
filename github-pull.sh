@@ -59,6 +59,6 @@ fi
 
 for userdir in $(ls -1 $GIT_BASEDIR); do
 	[ -d $GIT_BASEDIR/$userdir ] && update_all_repos $userdir
-	output_stats
 done
+output_stats
 
