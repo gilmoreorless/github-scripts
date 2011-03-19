@@ -2,7 +2,7 @@
 
 ### CONFIG ###
 
-GIT_BASEDIR=~/Sites/git
+GIT_BASEDIR=~/Sites/Github
 GIT_PULLCMD="git pull origin master"
 
 ### SCRIPT ###
