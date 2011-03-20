@@ -17,6 +17,7 @@ fi
 USERNAME=$1
 LIST_GOOD=""
 LIST_BAD=""
+LIST_SKIPPED=""
 START_TIME=$(date +%s)
 
 function update_all_repos {
@@ -26,11 +27,18 @@ function update_all_repos {
 	for repodir in $(ls -1 $DIR); do
 		if [ -d $DIR/$repodir -a -d $DIR/$repodir/.git ]; then
 			echo -e "\n-------- $repodir -------\n"
-			cd $DIR/$repodir/ && $GIT_PULLCMD
-			if [ $? = 0 ]; then
-				LIST_GOOD="${LIST_GOOD}$1/$repodir\n"
+			cd $DIR/$repodir/
+			STATUS=$(git status -s)
+			if [ "$STATUS" = "" ]; then
+				git checkout master && $GIT_PULLCMD
+				if [ $? = 0 ]; then
+					LIST_GOOD="${LIST_GOOD}$1/$repodir\n"
+				else
+					LIST_BAD="${LIST_BAD}$1/$repodir\n"
+				fi
 			else
-				LIST_BAD="${LIST_BAD}$1/$repodir\n"
+				echo "Uncommitted changes found... skipping repository"
+				LIST_SKIPPED="${LIST_SKIPPED}$1/$repodir\n"
 			fi
 			FOUND=1
 		fi
@@ -47,6 +55,8 @@ function output_stats {
 	[ -n "$LIST_GOOD" ] && echo -e $LIST_GOOD || echo -e "(No successful updates)\n"
 	echo -e "\n--- FAILED ---\n"
 	[ -n "$LIST_BAD" ] && echo -e $LIST_BAD || echo -e "(No failed updates)\n"
+	echo -e "\n--- SKIPPED (Uncommitted changes found) ---\n"
+	[ -n "$LIST_SKIPPED" ] && echo -e $LIST_SKIPPED || echo -e "(No skipped repositories)\n"
 	echo -e "\nTOTAL TIME: ${TOTAL_TIME}s\n"
 }
 
