@@ -1,11 +1,6 @@
 #!/bin/bash
 
-### CONFIG ###
-
-GIT_BASEDIR=~/Sites/Github
-
-
-### SCRIPT ###
+source `dirname $0`/github-config.sh
 
 PROGNAME=$(basename $0)
 if [ $# -lt 2 ]; then

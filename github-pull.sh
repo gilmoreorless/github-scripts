@@ -1,11 +1,6 @@
 #!/bin/bash
 
-### CONFIG ###
-
-GIT_BASEDIR=~/Sites/Github
-GIT_PULLCMD="git pull origin master"
-
-### SCRIPT ###
+source `dirname $0`/github-config.sh
 
 PROGNAME=$(basename $0)
 if [ "$1" = "-h" -o "$1" = "--help" ]; then
@@ -18,6 +13,7 @@ USERNAME=$1
 LIST_GOOD=""
 LIST_BAD=""
 LIST_SKIPPED=""
+LIST_IGNORED=""
 START_TIME=$(date +%s)
 
 function update_all_repos {
@@ -57,6 +53,8 @@ function output_stats {
 	[ -n "$LIST_BAD" ] && echo -e $LIST_BAD || echo -e "(No failed updates)\n"
 	echo -e "\n--- SKIPPED (Uncommitted changes found) ---\n"
 	[ -n "$LIST_SKIPPED" ] && echo -e $LIST_SKIPPED || echo -e "(No skipped repositories)\n"
+	echo -e "\n--- IGNORED USERNAMES ---\n"
+	[ -n "$LIST_IGNORED" ] && echo -e $LIST_IGNORED || echo -e "(No ignored usernames)\n"
 	echo -e "\nTOTAL TIME: ${TOTAL_TIME}s\n"
 }
 
@@ -72,7 +70,16 @@ if [ "$USERNAME" != "" ]; then
 fi
 
 for userdir in $(ls -1 $GIT_BASEDIR); do
-	[ -d $GIT_BASEDIR/$userdir ] && update_all_repos $userdir
+	if [ -d $GIT_BASEDIR/$userdir ]; then
+		# There's probably a better way to do this filtering, but I can't be bothered searching for it
+		SKIP_USER=$(echo " $PULL_IGNOREUSERNAMES " | grep " $userdir ")
+		if [ "$SKIP_USER" == "" ]; then
+			update_all_repos $userdir
+		else
+			echo -e "\n\n----- $userdir (IGNORED) -----"
+			LIST_IGNORED="${LIST_IGNORED}$userdir\n"
+		fi
+	fi
 done
 output_stats
 

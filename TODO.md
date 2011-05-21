@@ -1,4 +1,3 @@
 Notes and ideas for improvements:
 
-* all: Better config options
-
+* pull: Use terminal colours in stats output
