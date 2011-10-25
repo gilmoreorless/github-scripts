@@ -25,8 +25,9 @@ function update_all_repos {
 			echo -e "\n-------- $repodir -------\n"
 			cd $DIR/$repodir/
 			STATUS=$(git status -s)
-			if [ "$STATUS" = "" ]; then
-				git checkout master && $GIT_PULLCMD
+			if [ "$STATUS" = "" -o "$GOT_SMART" = "y" ]; then
+				[ "$GOT_SMART" = "n" ] && git checkout master
+				$GIT_PULLCMD
 				if [ $? = 0 ]; then
 					LIST_GOOD="${LIST_GOOD}$1/$repodir\n"
 				else
