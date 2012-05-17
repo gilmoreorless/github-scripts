@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# DEPENDENCIES:
+# pip install gitpython
+
 import os
 import json
 import subprocess
@@ -13,7 +16,7 @@ def get_repo_info(path):
         'path': root
     }
     repo = Repo(path)
-    # CHECKS:
+    # CHECKS: (v = Done; / = Partially-done; - = Todo)
     # v Uncommitted changes
     # / Branch list [origin/gh-pages only]
     # / GitHub master [needs fetch]
@@ -50,20 +53,20 @@ def get_branch_info(repo, repo_data, branch_name):
     }
 
     origin_branch_name = 'origin/' + branch_name
-    print origin_branch_name
+    # print origin_branch_name
     if repo_data['origin']:
         try:
             head_remote = repo.rev_parse(origin_branch_name).hexsha
         except BadObject:
             head_remote = None
-        print 'head_remote', head_remote
+        # print 'head_remote', head_remote
         if head_remote:
             branch_data['in_origin'] = True
 
             head_local = repo.rev_parse(branch_name).hexsha
-            print 'head_local', head_local
+            # print 'head_local', head_local
             if head_local == head_remote:
-                print 'Same refs, no difference'
+                # print 'Same refs, no difference'
                 return branch_data
 
             # merge_base = repo.git.execute(['merge-base'])#, head_local, head_remote])
@@ -74,16 +77,16 @@ def get_branch_info(repo, repo_data, branch_name):
                                     stderr=subprocess.PIPE,
                                     )
             merge_base = proc.communicate()[0][:-1]  # Account for newline character at end of line
-            print 'merge_base', merge_base
+            # print 'merge_base', merge_base
 
             if head_local != merge_base:
                 commits_ahead = sum(1 for com in repo.iter_commits(merge_base + '..' + head_local))
-                print 'commits_ahead', commits_ahead
+                # print 'commits_ahead', commits_ahead
                 branch_data['commits_ahead'] = commits_ahead
 
             if head_remote != merge_base:
                 commits_behind = sum(1 for com in repo.iter_commits(merge_base + '..' + head_remote))
-                print 'commits_behind', commits_behind
+                # print 'commits_behind', commits_behind
                 branch_data['commits_behind'] = commits_behind
 
     return branch_data
@@ -93,17 +96,17 @@ userdir = os.getcwd()
 if len(argv) > 1:
     userdir = argv[1]
 
-print 'CWD:', userdir
+# print 'CWD:', userdir
 for root, dirs, files in os.walk(userdir):
     if root != userdir:
         del dirs[:]
-    # if os.path.isdir(os.path.join(root, '.git')):
-    if root == userdir + '/css3-raphael-logo' and os.path.isdir(os.path.join(root, '.git')):
+    if os.path.isdir(os.path.join(root, '.git')):
+    # if root == userdir + '/css3-raphael-logo' and os.path.isdir(os.path.join(root, '.git')):
     # if root == userdir + '/jquery-dom-line' and os.path.isdir(os.path.join(root, '.git')):
-        print '---', root, '---'
+        # print '---', root, '---'
         repos.append(get_repo_info(root))
 
-#print 'REPOS:', repos
-for repo in repos:
-#   os.chdir(repo['path'])
-    print 'REPO:', repo
+# for repo in repos:
+#     print 'REPO:', repo
+
+print json.dumps(repos, separators=(',', ':'))
